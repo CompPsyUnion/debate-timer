@@ -22,11 +22,7 @@
   </Transition>
 
   <!-- Timer View -->
-  <DebateTimer
-    ref="debateTimerRef"
-    :timer-data="timerData"
-    @timer-end="handleTimerEnd"
-  />
+  <DebateTimer ref="debateTimerRef" :timer-data="timerData" @timer-end="handleTimerEnd" />
 
   <!-- Keyboard Hints Overlay -->
   <Transition name="fade">
@@ -79,8 +75,8 @@ import type { TimerData, TimerStage } from '@/types/screen';
 import { getDefaultTimerStages } from '@/utils/timerDefaults';
 
 const timerData = ref<TimerData>({
-  activityName: '2025 城市杯大学辩论赛',
-  debateTitle: '人工智能是否利大于弊',
+  activityName: '测试活动',
+  debateTitle: '短暂的陪伴是一种恩赐/惩罚',
   stages: getDefaultTimerStages(),
   timestamp: new Date().toISOString(),
 });
