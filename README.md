@@ -8,6 +8,8 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4?logo=tailwind-css)](https://tailwindcss.com/)
 [![DaisyUI](https://img.shields.io/badge/DaisyUI-5.1-5A0EF8)](https://daisyui.com/)
 
+[English README](https://github.com/CompPsyUnion/debate-timer/blob/main/README_en.md)
+
 ---
 
 ## 📖 项目简介
