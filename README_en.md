@@ -1,6 +1,6 @@
 # 🎯 Debate Timer
 
-> UNNC Computer Psychology Union Debate Competition Timing System
+> UNNC Computer Psycho Union Debate Competition Timing System
 > A professional, flexible, and easy-to-use debate timer suitable for various debate competitions
 
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js)](https://vuejs.org/)
@@ -12,7 +12,10 @@
 
 ## 📖 Project Introduction
 
-This project is a debate competition timing system developed for UNNC Computer Psychology Union, aiming to provide professional and flexible timing solutions for debate competitions.
+This project is a debate competition timing system developed for UNNC Computer Psycho Union, aiming to provide professional and flexible timing solutions for debate competitions.
+
+Maintainer of the project: [@Gentle-Lijie](https://github.com/Gentle-Lijie), [@HNRobert](https://github.com/HNRobert)
+
 
 **Core Features:**
 
@@ -369,7 +372,7 @@ Thanks to all classmates who contributed to this project!
 
 ## 📮 Contact Us
 
-- **Organization**: UNNC Computer Psychology Union
+- **Organization**: UNNC Computer Psycho Union
 - **GitHub**: [CompPsyUnion/debate-timer](https://github.com/CompPsyUnion/debate-timer)
 
 ---

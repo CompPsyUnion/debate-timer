@@ -12,7 +12,9 @@
 
 ## 📖 项目简介
 
-本项目是为 UNNC Computer Psychology Union 开发的辩论赛计时系统，旨在为辩论赛提供专业、灵活的计时解决方案。
+本项目是为 UNNC Computer Psycho Union 开发的辩论赛计时系统，旨在为辩论赛提供专业、灵活的计时解决方案。
+
+本项目维护者为：[@Gentle-Lijie](https://github.com/Gentle-Lijie), [@HNRobert](https://github.com/HNRobert)
 
 **核心特性：**
 
@@ -369,7 +371,7 @@ docs: 更新 README 中的快捷键说明
 
 ## 📮 联系我们
 
-- **组织**: UNNC Computer Psychology Union
+- **组织**: UNNC Computer Psycho Union
 - **GitHub**: [CompPsyUnion/debate-timer](https://github.com/CompPsyUnion/debate-timer)
 
 ---
