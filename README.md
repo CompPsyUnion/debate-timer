@@ -130,7 +130,7 @@ debate-timer/
 
 ---
 
-## 📝 待完成任务清单 (TODO)
+## 📝 TODO
 
 ### 🎨 UI/UX 优化
 
