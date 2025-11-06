@@ -1,6 +1,6 @@
 # 🎯 辩论计时器 | Debate Timer
 
-> UNNC Computer Psychology Union 辩论赛计时系统  
+> UNNC Computer Psycho Union 辩论赛计时系统  
 > 一个专业、灵活、易用的辩论计时器，适合各类辩论赛事使用
 
 [![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js)](https://vuejs.org/)
@@ -98,6 +98,12 @@ npm run preview
 
 ```
 debate-timer/
+├── config/
+│   ├── eslint.config.ts       # ESLint 配置
+│   ├── postcss.config.js      # PostCSS 配置
+│   ├── tailwind.config.js     # Tailwind CSS 配置
+│   ├── tsconfig.json          # TypeScript 配置
+│   ├── vite.config.ts         # Vite 配置
 ├── src/
 │   ├── components/
 │   │   └── screen/
@@ -114,10 +120,8 @@ debate-timer/
 │   ├── App.vue                          # 根组件
 │   └── main.ts                          # 应用入口
 ├── index.html                           # HTML 模板
-├── vite.config.ts                       # Vite 配置
-├── tailwind.config.js                   # Tailwind CSS 配置
-├── tsconfig.json                        # TypeScript 配置
-└── package.json                         # 项目依赖
+├── package.json                         # 项目依赖
+└── README.md                            # 中文 README
 ```
 
 ---

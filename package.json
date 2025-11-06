@@ -4,15 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "start": "vite preview",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.ts --fix",
-    "lint:check": "eslint . --ext .vue,.js,.ts",
+    "dev": "vite --config config/vite.config.ts",
+    "build": "vue-tsc --project config/tsconfig.json -b && vite build --config config/vite.config.ts",
+    "start": "vite preview --config config/vite.config.ts",
+    "preview": "vite preview --config config/vite.config.ts",
+    "lint": "eslint . --config config/eslint.config.ts --ext .vue,.js,.ts --fix",
+    "lint:check": "eslint . --config config/eslint.config.ts --ext .vue,.js,.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:fix": "eslint . --ext .vue,.js,.ts --fix && prettier --write .",
+    "lint:fix": "eslint . --config config/eslint.config.ts --ext .vue,.js,.ts --fix && prettier --write .",
     "code-style": "npm run lint:fix && npm run format"
   },
   "dependencies": {
