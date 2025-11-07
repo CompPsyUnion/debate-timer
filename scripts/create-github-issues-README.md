@@ -24,9 +24,9 @@ GITHUB_TOKEN=ghp_your_token_here node scripts/create-github-issues.cjs
 ### 方法 2: 直接编辑脚本 (Edit the script directly)
 
 1. 打开 `scripts/create-github-issues.cjs`
-2. 在第 30 行修改 `GITHUB_TOKEN` 的值:
+2. 在第 27 行修改 `GITHUB_TOKEN` 的值:
    ```javascript
-   const GITHUB_TOKEN = 'ghp_your_token_here';
+   const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'ghp_your_token_here';
    ```
 3. 运行脚本:
    ```bash

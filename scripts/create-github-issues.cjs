@@ -24,7 +24,7 @@ const { execSync } = require('child_process');
 // ============================================================================
 
 // Set your GitHub token here or use GITHUB_TOKEN environment variable
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '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';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 
 // Repository information (auto-detected from git or set manually)
 const REPO_OWNER = 'CompPsyUnion';
@@ -38,8 +38,12 @@ const REPO_NAME = 'debate-timer';
  * Remove emoji characters from text
  */
 function removeEmojis(text) {
-  // Remove emoji characters
-  return text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+  // Remove emoji characters - comprehensive Unicode emoji ranges
+  // Also removes variation selectors and zero-width joiners
+  return text
+    .replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{200D}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**
@@ -160,8 +164,22 @@ function createIssue(todo, issueNumber, totalIssues, token) {
   console.log(`Creating issue ${issueNumber}/${totalIssues}: ${titleClean}`);
   
   try {
-    const command = `gh issue create --repo ${REPO_OWNER}/${REPO_NAME} --title "${title.replace(/"/g, '\\"')}" --body "${todo.body.replace(/"/g, '\\"')}" --label "${labels}"`;
-    execSync(command, { 
+    // Use array form to avoid shell injection
+    const args = [
+      'issue', 'create',
+      '--repo', `${REPO_OWNER}/${REPO_NAME}`,
+      '--title', title,
+      '--body', todo.body,
+      '--label', labels
+    ];
+    
+    execSync(`gh ${args.map(arg => {
+      // Properly escape arguments for shell
+      if (arg.includes(' ') || arg.includes('\n') || arg.includes('"') || arg.includes("'")) {
+        return "'" + arg.replace(/'/g, "'\\''") + "'";
+      }
+      return arg;
+    }).join(' ')}`, { 
       stdio: 'pipe',
       env: { ...process.env, GH_TOKEN: token }
     });
@@ -181,7 +199,7 @@ async function main() {
   console.log('');
   
   // Check if token is provided
-  if (!GITHUB_TOKEN || GITHUB_TOKEN === 'your_token_here') {
+  if (!GITHUB_TOKEN) {
     console.error('❌ Error: GitHub token not provided');
     console.error('   Please set GITHUB_TOKEN environment variable or edit the script');
     console.error('   Example: GITHUB_TOKEN=ghp_xxx node scripts/create-github-issues.cjs');
