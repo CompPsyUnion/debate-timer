@@ -1,5 +1,3 @@
-Parsing todos from: /home/runner/work/debate-timer/debate-timer/README.md
-Found 25 TODO items
 #!/bin/bash
 # Auto-generated script to create GitHub issues from README todos
 # Run this script with: bash create-issues.sh

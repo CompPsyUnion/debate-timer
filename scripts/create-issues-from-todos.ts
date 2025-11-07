@@ -182,10 +182,10 @@ function generateMarkdownReport(todos: TodoItem[]): string {
 // Main execution
 function main() {
   const readmePath = resolve(process.cwd(), 'README.md');
-  console.log(`Parsing todos from: ${readmePath}`);
+  console.error(`Parsing todos from: ${readmePath}`);
   
   const todos = parseReadmeTodos(readmePath);
-  console.log(`Found ${todos.length} TODO items`);
+  console.error(`Found ${todos.length} TODO items`);
   
   // Output results
   const output = process.argv[2] || 'markdown';
