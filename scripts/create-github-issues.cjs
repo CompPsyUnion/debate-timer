@@ -12,7 +12,7 @@
  * Usage:
  *   GITHUB_TOKEN=ghp_your_token_here node scripts/create-github-issues.cjs
  *   
- * Or set the token directly in the script (line 30)
+ * Or set the token directly in the script (line 27)
  */
 
 const fs = require('fs');
@@ -56,7 +56,7 @@ const EMOJI_RANGES = [
  * Remove emoji characters from text
  */
 function removeEmojis(text) {
-  const emojiPattern = new RegExp(`[${EMOJI_RANGES.join('|')}]`, 'gu');
+  const emojiPattern = new RegExp(`[${EMOJI_RANGES.join('')}]`, 'gu');
   return text
     .replace(emojiPattern, '')
     .replace(/\s+/g, ' ')
@@ -157,7 +157,6 @@ function authenticateGitHub(token) {
     // Use stdin to pass the token securely
     const result = spawnSync('gh', ['auth', 'login', '--with-token'], {
       input: token,
-      env: { ...process.env, GH_TOKEN: token },
       encoding: 'utf-8'
     });
     
