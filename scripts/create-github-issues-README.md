@@ -21,17 +21,15 @@ This is a standalone script to extract TODO items from README.md and automatical
 GITHUB_TOKEN=ghp_your_token_here node scripts/create-github-issues.cjs
 ```
 
-### 方法 2: 直接编辑脚本 (Edit the script directly)
+### 方法 2: 直接设置环境变量 (Set environment variable directly)
 
-1. 打开 `scripts/create-github-issues.cjs`
-2. 在第 27 行修改 `GITHUB_TOKEN` 的值:
-   ```javascript
-   const GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'ghp_your_token_here';
-   ```
-3. 运行脚本:
-   ```bash
-   node scripts/create-github-issues.cjs
-   ```
+在运行脚本前设置环境变量:
+```bash
+export GITHUB_TOKEN=ghp_your_token_here
+node scripts/create-github-issues.cjs
+```
+
+**注意**: 不建议在脚本中硬编码 token，这可能导致 token 意外泄露到版本控制系统中。
 
 ## 前置要求 (Prerequisites)
 
