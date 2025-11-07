@@ -17,31 +17,48 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 // Set your GitHub token here or use GITHUB_TOKEN environment variable
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 // Repository information (auto-detected from git or set manually)
 const REPO_OWNER = 'CompPsyUnion';
 const REPO_NAME = 'debate-timer';
 
+// Rate limiting delay between issue creation (in milliseconds)
+const RATE_LIMIT_DELAY_MS = 1000;
+
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+// Emoji removal patterns
+const EMOJI_RANGES = [
+  '\u{1F600}-\u{1F64F}', // Emoticons
+  '\u{1F300}-\u{1F5FF}', // Misc Symbols and Pictographs
+  '\u{1F680}-\u{1F6FF}', // Transport and Map
+  '\u{1F1E0}-\u{1F1FF}', // Regional country flags
+  '\u{2600}-\u{26FF}',   // Misc symbols
+  '\u{2700}-\u{27BF}',   // Dingbats
+  '\u{1F900}-\u{1F9FF}', // Supplemental Symbols and Pictographs
+  '\u{1FA00}-\u{1FA6F}', // Chess Symbols
+  '\u{1FA70}-\u{1FAFF}', // Symbols and Pictographs Extended-A
+  '\u{FE00}-\u{FE0F}',   // Variation Selectors
+  '\u{200D}'             // Zero Width Joiner
+];
 
 /**
  * Remove emoji characters from text
  */
 function removeEmojis(text) {
-  // Remove emoji characters - comprehensive Unicode emoji ranges
-  // Also removes variation selectors and zero-width joiners
+  const emojiPattern = new RegExp(`[${EMOJI_RANGES.join('|')}]`, 'gu');
   return text
-    .replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{FE00}-\u{FE0F}]|[\u{200D}]/gu, '')
+    .replace(emojiPattern, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -137,16 +154,23 @@ function authenticateGitHub(token) {
   console.log('🔐 Authenticating with GitHub...');
   
   try {
-    // Set the token for gh CLI
-    execSync(`echo "${token}" | gh auth login --with-token`, { 
-      stdio: 'pipe',
-      env: { ...process.env, GH_TOKEN: token }
+    // Use stdin to pass the token securely
+    const result = spawnSync('gh', ['auth', 'login', '--with-token'], {
+      input: token,
+      env: { ...process.env, GH_TOKEN: token },
+      encoding: 'utf-8'
     });
-    console.log('✅ Authentication successful\n');
-    return true;
+    
+    if (result.status === 0) {
+      console.log('✅ Authentication successful\n');
+      return true;
+    } else {
+      console.error('❌ Authentication failed');
+      console.error('   Please check your token and ensure it has repo permissions');
+      return false;
+    }
   } catch (error) {
-    console.error('❌ Authentication failed');
-    console.error('   Please check your token and ensure it has repo permissions');
+    console.error('❌ Authentication failed:', error.message);
     return false;
   }
 }
@@ -164,28 +188,30 @@ function createIssue(todo, issueNumber, totalIssues, token) {
   console.log(`Creating issue ${issueNumber}/${totalIssues}: ${titleClean}`);
   
   try {
-    // Use array form to avoid shell injection
-    const args = [
+    // Use spawn with argument array to avoid shell injection
+    const result = spawnSync('gh', [
       'issue', 'create',
       '--repo', `${REPO_OWNER}/${REPO_NAME}`,
       '--title', title,
       '--body', todo.body,
       '--label', labels
-    ];
-    
-    execSync(`gh ${args.map(arg => {
-      // Properly escape arguments for shell
-      if (arg.includes(' ') || arg.includes('\n') || arg.includes('"') || arg.includes("'")) {
-        return "'" + arg.replace(/'/g, "'\\''") + "'";
-      }
-      return arg;
-    }).join(' ')}`, { 
-      stdio: 'pipe',
-      env: { ...process.env, GH_TOKEN: token }
+    ], {
+      env: { ...process.env, GH_TOKEN: token },
+      encoding: 'utf-8'
     });
-    return true;
+    
+    if (result.status === 0) {
+      return true;
+    } else {
+      console.error(`❌ Failed to create issue: ${titleClean}`);
+      if (result.stderr) {
+        console.error(`   Error: ${result.stderr.trim()}`);
+      }
+      return false;
+    }
   } catch (error) {
     console.error(`❌ Failed to create issue: ${titleClean}`);
+    console.error(`   Error: ${error.message}`);
     return false;
   }
 }
@@ -242,7 +268,7 @@ async function main() {
     }
     
     // Small delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
   }
   
   // Summary
