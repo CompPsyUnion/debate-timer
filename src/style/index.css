@@ -27,3 +27,81 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* 按钮主题变量（可在此统一修改颜色） */
+:root {
+  --btn-primary: #1f6feb; /* 蓝色，未选中时用于文字与边框 */
+  --btn-primary-contrast: #ffffff; /* 选中后文字颜色 */
+
+  --btn-error: #ef4444; /* 删除按钮颜色 */
+  --btn-error-contrast: #ffffff;
+
+  --btn-radius: 0.5rem;
+}
+
+/* 使用 Tailwind 的 components layer 覆盖或补充 DaisyUI 的 .btn 样式 */
+@layer components {
+  /* 基本按钮：未选中 -> 透明背景 + 蓝色文字 + 蓝色边框 */
+  .btn {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: 1px solid var(--btn-primary);
+    border-radius: var(--btn-radius);
+    padding: .375rem .75rem; /* 与 btn-sm / btn-md 可叠加 */
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    white-space: nowrap; /* 确保含 svg + 文本的按钮不换行 */
+    transition: background-color .12s ease, color .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+
+  /* 选中/激活状态：蓝底白字 */
+  .btn.btn-active,
+  .btn:active,
+  .btn.selected {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+  }
+
+  /* 删除按钮：未选中时透明红字红框，选中时红底白字 */
+  .btn.btn-error {
+    background-color: transparent;
+    color: var(--btn-error);
+    border: 1px solid var(--btn-error);
+  }
+
+  .btn.btn-error.btn-active,
+  .btn.btn-error:active,
+  .btn.btn-error.selected {
+    background-color: var(--btn-error) !important;
+    color: var(--btn-error-contrast) !important;
+    border-color: var(--btn-error) !important;
+  }
+
+  /* 保存按钮（语义类），行为与主按钮一致，方便在模板中使用 .btn.btn-save */
+  .btn.btn-save {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: 1px solid var(--btn-primary);
+  }
+
+  .btn.btn-save.btn-active,
+  .btn.btn-save:active,
+  .btn.btn-save.selected {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+  }
+
+  /* 小圆按钮（保留 daisyui 的 btn-circle 语义，但确保颜色规则一致） */
+  .btn.btn-circle {
+    padding: .25rem;
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+  }
+}
