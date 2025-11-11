@@ -1,12 +1,12 @@
 <template>
   <dialog ref="modalRef" class="modal">
-    <div class="modal-box max-w-7xl h-[90vh] flex flex-col">
+  <div class="modal-box w-[30vw] max-w-[1200px] h-[90vh] flex flex-col">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-2xl font-bold">辩论计时器配置</h3>
+        <h3 class="text-2xl font-bold config-header">辩论计时器配置</h3>
         <div class="flex gap-2">
           <div class="tabs tabs-boxed">
-            <a class="tab" :class="{ 'tab-active': editMode === 'visual' }" @click="editMode = 'visual'">可视化编辑</a>
-            <a class="tab" :class="{ 'tab-active': editMode === 'json' }" @click="editMode = 'json'">JSON源码</a>
+            <button type="button" class="tab" :class="{ 'tab-active': editMode === 'visual' }" @click="editMode = 'visual'">可视化编辑</button>
+            <button type="button" class="tab" :class="{ 'tab-active': editMode === 'json' }" @click="editMode = 'json'">JSON源码</button>
           </div>
           <button class="btn btn-sm btn-circle btn-ghost" @click="emitClose">✕</button>
         </div>
@@ -221,13 +221,19 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-4 pt-4 border-t">
-        <button class="btn btn-ghost" @click="emitClose">取消</button>
-        <button class="btn btn-save" @click="handleSave">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          保存配置
-        </button>
+        <div class="flex-1"></div>
+        <div class="flex flex-col items-end">
+          <div v-if="saveError" class="text-error text-sm mb-2">{{ saveError }}</div>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-ghost" @click="emitClose">取消</button>
+            <button type="button" class="btn btn-save" @click="handleSave">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              保存配置
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
@@ -263,6 +269,7 @@ const editMode = ref<'visual' | 'json'>('visual');
 const localStages = ref<TimerStage[]>([]);
 const jsonSource = ref('');
 const jsonError = ref('');
+const saveError = ref('');
 
 const initialiseForm = () => {
   localStages.value = JSON.parse(JSON.stringify(props.stages)); // Deep copy
@@ -312,8 +319,8 @@ watch(editMode, newMode => {
 
 watch(
   localStages,
-  newStages => {
-    newStages.forEach(stage => {
+  (newStages: TimerStage[]) => {
+    newStages.forEach((stage: TimerStage) => {
       if (stage.isDualSide) {
         if (stage.sides.length === 1) {
           const firstSide = stage.sides[0];
@@ -415,40 +422,59 @@ const removeBell = (stageIndex: number, bellIndex: number) => {
 };
 
 const handleSave = () => {
+  saveError.value = '';
   if (editMode.value === 'json') {
     if (jsonError.value) {
+      saveError.value = 'JSON 格式错误，请修正后再保存';
       return;
     }
     syncFromJSON();
   }
 
   if (localStages.value.length === 0) {
+    saveError.value = '请至少添加一个阶段';
     return;
   }
 
   for (const stage of localStages.value) {
     if (!stage.stageName.trim()) {
+      saveError.value = '阶段名称不能为空';
       return;
     }
     if (stage.sides.length === 0) {
+      saveError.value = '阶段必须至少包含一个发言者';
       return;
     }
     for (const side of stage.sides) {
       if (!side.name.trim()) {
+        saveError.value = '发言者名称不能为空';
         return;
       }
       if (side.duration <= 0) {
+        saveError.value = '发言时长必须大于 0 秒';
         return;
       }
     }
   }
 
-  emit('save', {
+  const payload = {
     activityName: props.activityName,
     debateTitle: props.debateTitle,
     stages: localStages.value,
-  });
+  };
+
+  // 发出保存事件，通知父级更新数据
+  emit('save', payload);
+
+  // 立即把新的配置加载到当前页面（父组件通常会在收到 save 事件时更新传入的 props），
+  // 然后关闭右侧 modal，并通知父组件 modal 已关闭
+  saveError.value = '';
+  modalRef.value?.close();
+  emit('close');
 };
+</script>
+<script lang="ts">
+// non-setup script block left empty intentionally (style/ts hints)
 </script>
 
 <style scoped>

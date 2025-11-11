@@ -12,6 +12,56 @@
   font-display: swap;
 }
 
+/* Tabs: 模仿浏览器标签页的样式（底部细线，激活 tab 被上边框包住并抬起） */
+@layer components {
+  .tabs {
+    position: relative;
+    border-bottom: 1px solid rgba(31, 41, 55, 0.08); /* subtle divider */
+    padding-bottom: 0.25rem;
+  }
+
+  .tabs .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .4rem .75rem;
+    margin-right: .25rem;
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: calc(var(--btn-radius) - 2px);
+    border-top-right-radius: calc(var(--btn-radius) - 2px);
+    color: var(--btn-primary);
+    transition: background-color .12s ease, border-color .12s ease, color .12s ease, transform .06s ease;
+  }
+
+  .tabs .tab:hover,
+  .tabs .tab:focus {
+    background-color: rgba(31, 99, 255, 0.06); /* subtle hover */
+    cursor: pointer;
+  }
+
+  /* Active tab: 抬起并在上方被边框包住，底部与容器的底线相连 */
+  .tabs .tab.tab-active,
+  .tabs .tab:active {
+    background-color: var(--btn-primary-contrast); /* white */
+    color: var(--btn-primary);
+    border-color: rgba(31, 41, 55, 0.12);
+    border-bottom-color: transparent;
+    position: relative;
+    top: 1px; /* 抬起视觉 */
+    box-shadow: 0 -1px 0 0 rgba(31, 41, 55, 0.04);
+    z-index: 10;
+  }
+
+  /* Make sure boxed tabs inside .tabs-boxed don't double-border */
+  .tabs.tabs-boxed .tab.tab-active {
+    border-left-width: 1px;
+    border-right-width: 1px;
+  }
+}
+
 .font-number {
   font-family: 'D-DIN', 'SF Pro', sans-serif;
 }
@@ -39,6 +89,10 @@
   --btn-radius: 0.5rem;
 }
 
+.config-header{
+  margin:10px;
+}
+
 /* 使用 Tailwind 的 components layer 覆盖或补充 DaisyUI 的 .btn 样式 */
 @layer components {
   /* 基本按钮：未选中 -> 透明背景 + 蓝色文字 + 蓝色边框 */
@@ -64,6 +118,16 @@
     border-color: var(--btn-primary) !important;
   }
 
+  /* 悬停与聚焦时高亮（鼠标移动到按钮上即显示选中样式） */
+  .btn:hover,
+  .btn:focus,
+  .btn:focus-visible {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+    cursor: pointer;
+  }
+
   /* 删除按钮：未选中时透明红字红框，选中时红底白字 */
   .btn.btn-error {
     background-color: transparent;
@@ -79,6 +143,16 @@
     border-color: var(--btn-error) !important;
   }
 
+  /* 删除按钮悬停/聚焦高亮为红色 */
+  .btn.btn-error:hover,
+  .btn.btn-error:focus,
+  .btn.btn-error:focus-visible {
+    background-color: var(--btn-error) !important;
+    color: var(--btn-error-contrast) !important;
+    border-color: var(--btn-error) !important;
+    cursor: pointer;
+  }
+
   /* 保存按钮（语义类），行为与主按钮一致，方便在模板中使用 .btn.btn-save */
   .btn.btn-save {
     background-color: transparent;
@@ -92,6 +166,16 @@
     background-color: var(--btn-primary) !important;
     color: var(--btn-primary-contrast) !important;
     border-color: var(--btn-primary) !important;
+  }
+
+  /* 保存按钮悬停/聚焦高亮 */
+  .btn.btn-save:hover,
+  .btn.btn-save:focus,
+  .btn.btn-save:focus-visible {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+    cursor: pointer;
   }
 
   /* 小圆按钮（保留 daisyui 的 btn-circle 语义，但确保颜色规则一致） */

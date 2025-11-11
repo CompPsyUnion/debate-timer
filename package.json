@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --config config/vite.config.ts",
+  "dev": "vite --config config/vite.config.ts --host",
     "build": "vue-tsc --project config/tsconfig.json && vite build --config config/vite.config.ts",
     "start": "vite preview --config config/vite.config.ts",
     "preview": "vite preview --config config/vite.config.ts",
