@@ -7,6 +7,9 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/debate-timer/' : '/',
   plugins: [vue(), tailwindcss()],
+  server: {
+    host: true,
+  },
   css: {
     postcss: './config/postcss.config.js'
   },

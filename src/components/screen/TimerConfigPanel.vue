@@ -1,6 +1,15 @@
 <template>
-  <dialog ref="modalRef" class="modal">
-  <div class="modal-box w-[30vw] max-w-[1200px] h-[90vh] flex flex-col">
+  <!-- use v-if driven wrapper instead of native <dialog> to avoid dialog API inconsistencies -->
+  <!-- fixed overlay that aligns the panel to the right with padding (margins) so it doesn't sit at the bottom -->
+  <div
+    ref="modalRef"
+    v-if="props.open"
+    role="dialog"
+    aria-modal="true"
+  class="fixed inset-0 z-50 flex items-start justify-start p-6 pointer-events-auto"
+    @click="onDialogClick"
+  >
+  <div class="modal-box bg-white w-[30vw] max-w-[1200px] h-[90vh] flex flex-col rounded-lg shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-2xl font-bold config-header">辩论计时器配置</h3>
         <div class="flex gap-2">
@@ -8,7 +17,7 @@
             <button type="button" class="tab" :class="{ 'tab-active': editMode === 'visual' }" @click="editMode = 'visual'">可视化编辑</button>
             <button type="button" class="tab" :class="{ 'tab-active': editMode === 'json' }" @click="editMode = 'json'">JSON源码</button>
           </div>
-          <button class="btn btn-sm btn-circle btn-ghost" @click="emitClose">✕</button>
+          <button type="button" class="btn btn-sm btn-circle btn-ghost" @click="emitClose">✕</button>
         </div>
       </div>
 
@@ -19,7 +28,7 @@
               <div class="card-body p-4">
                 <div class="flex items-center justify-between mb-3">
                   <h4 class="font-bold text-lg">阶段 {{ index + 1 }}</h4>
-                  <button class="btn btn-sm btn-error btn-ghost" @click="removeStage(index)">
+                  <button type="button" class="btn btn-sm btn-error btn-ghost" @click="removeStage(index)">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-5 w-5"
@@ -93,6 +102,7 @@
                       />
                     </div>
                     <button
+                      type="button"
                       v-if="stage.sides.length > 1"
                       class="btn btn-sm btn-ghost btn-error"
                       @click="removeSide(index, sideIndex)"
@@ -114,6 +124,7 @@
                     </button>
                   </div>
                   <button
+                    type="button"
                     v-if="!stage.isDualSide || stage.sides.length < 2"
                     class="btn btn-sm btn-outline"
                     @click="addSide(index)"
@@ -156,7 +167,7 @@
                         <option value="end">结束铃</option>
                       </select>
                     </div>
-                    <button class="btn btn-sm btn-ghost btn-error" @click="removeBell(index, bellIndex)">
+                    <button type="button" class="btn btn-sm btn-ghost btn-error" @click="removeBell(index, bellIndex)">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-4 w-4"
@@ -173,7 +184,7 @@
                       </svg>
                     </button>
                   </div>
-                  <button class="btn btn-sm btn-outline" @click="addBell(index)">
+                  <button type="button" class="btn btn-sm btn-outline" @click="addBell(index)">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       class="h-4 w-4"
@@ -189,7 +200,7 @@
               </div>
             </div>
 
-            <button class="btn btn-primary btn-block" @click="addStage">
+            <button type="button" class="btn btn-primary btn-block" @click="addStage">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-5 w-5"
@@ -220,7 +231,7 @@
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 mt-4 pt-4 border-t">
+  <div class="flex justify-end gap-2 mt-4 pt-4 border-t modal-actions">
         <div class="flex-1"></div>
         <div class="flex flex-col items-end">
           <div v-if="saveError" class="text-error text-sm mb-2">{{ saveError }}</div>
@@ -236,14 +247,11 @@
         </div>
       </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button>关闭</button>
-    </form>
-  </dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import type { TimerStage } from '@/types/screen';
 
 interface EmitPayload {
@@ -262,14 +270,17 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'save', payload: EmitPayload): void;
+  (e: 'update:open', value: boolean): void;
 }>();
 
-const modalRef = ref<HTMLDialogElement | null>(null);
+// use a generic HTMLElement ref; we no longer rely on native dialog API
+const modalRef = ref<HTMLElement | null>(null);
 const editMode = ref<'visual' | 'json'>('visual');
 const localStages = ref<TimerStage[]>([]);
 const jsonSource = ref('');
 const jsonError = ref('');
 const saveError = ref('');
+// child no longer shows alerts — parent will handle page-level alerts
 
 const initialiseForm = () => {
   localStages.value = JSON.parse(JSON.stringify(props.stages)); // Deep copy
@@ -342,17 +353,78 @@ watch(
   (open: boolean) => {
     if (open) {
       initialiseForm();
-      modalRef.value?.showModal();
     } else {
-      modalRef.value?.close();
+      // parent controls visibility via prop -> v-if; nothing else needed here
     }
   },
   { immediate: true },
 );
 
-const emitClose = () => {
+/**
+ * Close modal in a single place so all callers behave the same.
+ * This will close the native <dialog> (if open) and emit the 'close' event
+ * so the parent can update its `open` state.
+ */
+const closeModal = () => {
+  // eslint-disable-next-line no-console
+  console.debug('[TimerConfigPanel] closeModal called — before close', { modalRef: modalRef.value, propOpen: props.open });
+
+  try {
+    if (modalRef.value) {
+      // hide element as a defensive fallback in case parent state doesn't update immediately
+      try {
+        modalRef.value.style.display = 'none';
+      } catch (e) {
+        // ignore
+      }
+      try {
+        document.body.classList.remove('modal-open');
+      } catch (e) {
+        // ignore
+      }
+      // eslint-disable-next-line no-console
+      console.debug('[TimerConfigPanel] closeModal applied fallback hide');
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.debug('[TimerConfigPanel] closeModal fallback error', err);
+  }
+
+  // Notify parent that modal should be closed
   emit('close');
+  // also support v-model style update if parent uses it
+  emit('update:open', false);
+
+  // log after
+  // eslint-disable-next-line no-console
+  console.debug('[TimerConfigPanel] closeModal called — after close', { modalRef: modalRef.value, propOpen: props.open });
 };
+
+// kept for template compatibility (used by some buttons)
+const emitClose = () => closeModal();
+
+const onDialogClick = (e: MouseEvent) => {
+  // if click happened on the dialog backdrop (outside modal-box), close
+  if (e.target === modalRef.value) {
+    closeModal();
+  }
+};
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    if (props.open) {
+      closeModal();
+    }
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown);
+});
 
 const addStage = () => {
   localStages.value.push({
@@ -437,10 +509,7 @@ const handleSave = () => {
   }
 
   for (const stage of localStages.value) {
-    if (!stage.stageName.trim()) {
-      saveError.value = '阶段名称不能为空';
-      return;
-    }
+    // 阶段名称允许为空（按用户要求关闭“名称为空”校验）
     if (stage.sides.length === 0) {
       saveError.value = '阶段必须至少包含一个发言者';
       return;
@@ -464,13 +533,13 @@ const handleSave = () => {
   };
 
   // 发出保存事件，通知父级更新数据
+  // debug log: ensure handler is invoked
+  // eslint-disable-next-line no-console
+  console.debug('[TimerConfigPanel] emitting save', payload);
   emit('save', payload);
 
-  // 立即把新的配置加载到当前页面（父组件通常会在收到 save 事件时更新传入的 props），
-  // 然后关闭右侧 modal，并通知父组件 modal 已关闭
-  saveError.value = '';
-  modalRef.value?.close();
-  emit('close');
+  // 立即关闭 modal 并通知父组件；父组件将在 applyConfig 中显示页面级 alert
+  closeModal();
 };
 </script>
 <script lang="ts">

@@ -99,8 +99,9 @@
       <!-- Stage Navigation - Bottom Corners (Always visible) -->
     </div>
 
-    <!-- Stage Navigation - Bottom Corners (Always visible) -->
-    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end pointer-events-none">
+  <!-- Stage Navigation - Bottom Corners (Always visible) -->
+  <!-- Changed to fixed so it sticks to viewport corners regardless of container scroll/layout -->
+  <div class="fixed bottom-4 left-4 right-4 flex justify-between items-end pointer-events-none z-40">
       <!-- Previous Stage -->
       <div v-if="hasPreviousStage" class="flex flex-col items-start pointer-events-auto">
         <button class="btn btn-ghost btn-sm mb-2 opacity-70 hover:opacity-100" @click="navigateToPreviousStage">
