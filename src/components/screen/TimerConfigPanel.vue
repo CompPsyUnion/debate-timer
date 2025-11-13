@@ -252,7 +252,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import type { TimerStage } from '@/types/screen';
+import type { TimerStage } from '../../types/screen';
 
 interface EmitPayload {
   activityName: string;

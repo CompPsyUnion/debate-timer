@@ -78,10 +78,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import DebateTimer from '@/components/screen/debateTimer.vue';
-import TimerConfigPanel from '@/components/screen/TimerConfigPanel.vue';
-import type { TimerData, TimerStage } from '@/types/screen';
-import { getDefaultTimerStages } from '@/utils/timerDefaults';
+import DebateTimer from '../components/screen/debateTimer.vue';
+import TimerConfigPanel from '../components/screen/TimerConfigPanel.vue';
+import type { TimerData, TimerStage } from '../types/screen';
+import { getDefaultTimerStages } from '../utils/timerDefaults';
 
 const timerData = ref<TimerData>({
   activityName: '测试活动',

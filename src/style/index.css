@@ -221,3 +221,90 @@
     border-radius: 9999px;
   }
 }
+ 
+/* Card 组件样式：与现有风格一致，使用相同的圆角、阴影与主色变量 */
+@layer components {
+  .card {
+    background: var(--card-bg, #ffffff);
+    border-radius: var(--btn-radius);
+    border: 1px solid rgba(31, 41, 55, 0.06);
+    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
+    overflow: hidden;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+
+  /* 悬停时轻微抬起和加深阴影以提示可交互性 */
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.10);
+  }
+
+  /* 头部/主体/尾部的统一内边距和分割线 */
+  .card-header,
+  .card-footer {
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    background-clip: padding-box;
+  }
+
+  .card-header {
+    border-bottom: 1px solid rgba(31, 41, 55, 0.04);
+    background: linear-gradient(180deg, rgba(31, 99, 255, 0.02), transparent);
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: var(--fallback-bc, #3270c7);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .card-subtitle {
+    font-size: .85rem;
+    color: rgba(31, 41, 55, 0.6);
+  }
+
+  .card-body {
+    padding: 1rem;
+    color: rgba(31, 41, 55, 0.9);
+  }
+
+  .card-footer {
+    border-top: 1px solid rgba(31, 41, 55, 0.04);
+    justify-content: flex-end;
+    background-color: transparent;
+  }
+
+  /* 侧重色条（例如用于表示状态或队伍颜色） */
+  .card.accent-left {
+    border-left: 4px solid var(--btn-primary);
+  }
+
+  /* 小尺寸/紧凑模式 */
+  .card.card-compact .card-header,
+  .card.card-compact .card-body,
+  .card.card-compact .card-footer {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+
+  /* 数字或计时器类文本，使用项目中已有的等宽风格 */
+  .card .num,
+  .card .time {
+    font-family: 'D-DIN', 'SF Pro', sans-serif;
+    font-weight: 600;
+    color: var(--btn-primary);
+  }
+
+  /* 响应式微调 */
+  @media (max-width: 640px) {
+    .card { border-radius: .5rem; }
+    .card-header, .card-footer { padding: .5rem; }
+    .card-body { padding: .75rem; }
+  }
+}

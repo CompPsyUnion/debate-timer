@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import type { TimerData, TimerStage } from '@/types/screen';
+import type { TimerData, TimerStage } from '../../types/screen';
 
 const props = defineProps<{
   timerData: TimerData | null;
