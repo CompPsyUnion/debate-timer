@@ -9,7 +9,7 @@
   class="fixed inset-0 z-50 flex items-start justify-start p-6 pointer-events-auto"
     @click="onDialogClick"
   >
-  <div class="modal-box bg-white w-[30vw] max-w-[1200px] h-[90vh] flex flex-col rounded-lg shadow-2xl">
+  <div class="modal-box bg-white w-[45vw] max-w-[1200px] h-[90vh] flex flex-col rounded-lg shadow-2xl">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-2xl font-bold config-header">辩论计时器配置</h3>
         <div class="flex gap-2">
@@ -22,7 +22,7 @@
       </div>
 
       <div class="flex-1 overflow-hidden">
-        <div v-if="editMode === 'visual'" class="h-full overflow-y-auto pr-2">
+        <div v-if="editMode === 'visual'" class="h-full overflow-y-auto">
           <div class="space-y-4">
             <StageCard v-for="(stage, index) in localStages" :key="index" :stage="stage" :index="index" @remove-stage="removeStage" @add-side="addSide" @remove-side="removeSide" @add-bell="addBell" @remove-bell="removeBell" />
 
@@ -275,18 +275,8 @@ const removeStage = (index: number) => {
   }
 };
 
-const addSide = (stageIndex: number) => {
-  const stage = localStages.value[stageIndex];
-  if (!stage) return;
-
-  if (stage.isDualSide && stage.sides.length >= 2) {
-    return;
-  }
-
-  stage.sides.push({
-    name: stage.isDualSide ? (stage.sides.length === 0 ? '正方' : '反方') : '发言者',
-    duration: 180,
-  });
+const addSide = (_stageIndex: number) => {
+  // Note: Side is already added by StageCard component, just sync JSON
   syncToJSON();
 };
 
