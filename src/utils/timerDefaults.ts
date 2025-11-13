@@ -1,4 +1,4 @@
-import type { TimerStage } from '@/types/screen';
+import type { TimerStage } from '../types/screen';
 
 /**
  * Get default timer configuration stages

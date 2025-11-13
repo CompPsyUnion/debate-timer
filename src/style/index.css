@@ -12,6 +12,98 @@
   font-display: swap;
 }
 
+/* Tabs: 模仿浏览器标签页的样式（底部细线，激活 tab 被上边框包住并抬起） */
+@layer components {
+
+  /* Position modal as a right-side centered panel with rounded corners and drop shadow */
+  .modal {
+    display: flex;
+    align-items: center;
+    /* vertical center */
+    justify-content: flex-end;
+    /* align to right */
+    padding: 1.25rem;
+    /* space from viewport edges */
+  }
+
+  /* Ensure modal-box looks like a floating panel with rounded corners and shadow */
+  .modal-box {
+    border-radius: .75rem;
+    /* 12px */
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.12);
+    background-clip: padding-box;
+    overflow: hidden;
+    padding: 1rem;
+    /* ensure inner spacing so buttons are away from edges */
+  }
+
+  /* Remove grey overlay/backdrop so main screen isn't dimmed */
+  .modal-backdrop {
+    background: transparent !important;
+  }
+
+  /* dialog backdrop (native) */
+  dialog::backdrop {
+    background: transparent !important;
+  }
+
+  /* Give cancel/save buttons a bit more breathing room */
+  .modal-actions .btn {
+    margin-left: 0.5rem;
+  }
+
+  .tabs {
+    position: relative;
+    border-bottom: 1px solid rgba(31, 41, 55, 0.08);
+    /* subtle divider */
+    padding-bottom: 0.25rem;
+  }
+
+  .tabs .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .4rem .75rem;
+    margin-right: .25rem;
+    margin-bottom: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: calc(var(--btn-radius) - 2px);
+    border-top-right-radius: calc(var(--btn-radius) - 2px);
+    color: var(--btn-primary);
+    transition: background-color .12s ease, border-color .12s ease, color .12s ease, transform .06s ease;
+  }
+
+  .tabs .tab:hover,
+  .tabs .tab:focus {
+    background-color: rgba(31, 99, 255, 0.06);
+    /* subtle hover */
+    cursor: pointer;
+  }
+
+  /* Active tab: 抬起并在上方被边框包住，底部与容器的底线相连 */
+  .tabs .tab.tab-active,
+  .tabs .tab:active {
+    background-color: var(--btn-primary-contrast);
+    /* white */
+    color: var(--btn-primary);
+    border-color: rgba(31, 41, 55, 0.12);
+    border-bottom-color: transparent;
+    position: relative;
+    top: 1px;
+    /* 抬起视觉 */
+    box-shadow: 0 -1px 0 0 rgba(31, 41, 55, 0.04);
+    z-index: 10;
+  }
+
+  /* Make sure boxed tabs inside .tabs-boxed don't double-border */
+  .tabs.tabs-boxed .tab.tab-active {
+    border-left-width: 1px;
+    border-right-width: 1px;
+  }
+}
+
 .font-number {
   font-family: 'D-DIN', 'SF Pro', sans-serif;
 }
@@ -26,4 +118,410 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 按钮主题变量（可在此统一修改颜色） */
+:root {
+  --btn-primary: #1f6feb;
+  /* 蓝色，未选中时用于文字与边框 */
+  --btn-primary-contrast: #ffffff;
+  /* 选中后文字颜色 */
+
+  --btn-error: #ef4444;
+  /* 删除按钮颜色 */
+  --btn-error-contrast: #ffffff;
+
+  --btn-radius: 0.5rem;
+}
+
+.config-header {
+  margin: 10px;
+}
+
+/* 使用 Tailwind 的 components layer 覆盖或补充 DaisyUI 的 .btn 样式 */
+@layer components {
+
+  /* 基本按钮：未选中 -> 透明背景 + 蓝色文字 + 蓝色边框 */
+  .btn {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: 1px solid var(--btn-primary);
+    border-radius: var(--btn-radius);
+    padding: .375rem .75rem;
+    /* 与 btn-sm / btn-md 可叠加 */
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    white-space: nowrap;
+    /* 确保含 svg + 文本的按钮不换行 */
+    transition: background-color .12s ease, color .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+
+  /* 选中/激活状态：蓝底白字 */
+  .btn.btn-active,
+  .btn:active,
+  .btn.selected {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+  }
+
+  /* 悬停与聚焦时高亮（鼠标移动到按钮上即显示选中样式） */
+  .btn:hover,
+  .btn:focus,
+  .btn:focus-visible {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+    cursor: pointer;
+  }
+
+  /* 删除按钮：未选中时透明红字红框，选中时红底白字 */
+  .btn.btn-error {
+    background-color: transparent;
+    color: var(--btn-error);
+    border: 1px solid var(--btn-error);
+  }
+
+  .btn.btn-error.btn-active,
+  .btn.btn-error:active,
+  .btn.btn-error.selected {
+    background-color: var(--btn-error) !important;
+    color: var(--btn-error-contrast) !important;
+    border-color: var(--btn-error) !important;
+  }
+
+  /* 删除按钮悬停/聚焦高亮为红色 */
+  .btn.btn-error:hover,
+  .btn.btn-error:focus,
+  .btn.btn-error:focus-visible {
+    background-color: var(--btn-error) !important;
+    color: var(--btn-error-contrast) !important;
+    border-color: var(--btn-error) !important;
+    cursor: pointer;
+  }
+
+  /* 保存按钮（语义类），行为与主按钮一致，方便在模板中使用 .btn.btn-save */
+  .btn.btn-save {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: 1px solid var(--btn-primary);
+  }
+
+  .btn.btn-save.btn-active,
+  .btn.btn-save:active,
+  .btn.btn-save.selected {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+  }
+
+  /* 保存按钮悬停/聚焦高亮 */
+  .btn.btn-save:hover,
+  .btn.btn-save:focus,
+  .btn.btn-save:focus-visible {
+    background-color: var(--btn-primary) !important;
+    color: var(--btn-primary-contrast) !important;
+    border-color: var(--btn-primary) !important;
+    cursor: pointer;
+  }
+
+  /* 小圆按钮（保留 daisyui 的 btn-circle 语义，但确保颜色规则一致） */
+  .btn.btn-circle {
+    padding: .25rem;
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+  }
+
+  /* 自定义checkbox样式，使用主色调并添加选中/取消动画 */
+  .checkbox {
+    appearance: none;
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid var(--btn-primary);
+    border-radius: var(--btn-radius);
+    position: relative;
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    vertical-align: middle;
+  }
+
+  .checkbox:checked {
+    background-color: var(--btn-primary);
+    border-color: var(--btn-primary);
+  }
+
+  .checkbox::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    color: var(--btn-primary-contrast);
+    font-size: 0.8em;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .checkbox:checked::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* 确保input[type="number"]的上下箭头一直显示 */
+  input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: auto;
+    opacity: 1;
+    margin: 0;
+    background-color: var(--btn-primary);
+    color: var(--btn-primary-contrast);
+    border: 1px solid var(--btn-primary);
+    border-radius: 0 var(--btn-radius) var(--btn-radius) 0;
+  }
+}
+
+/* Card 组件样式：与现有风格一致，使用相同的圆角、阴影与主色变量 */
+@layer components {
+  .card {
+    background: var(--card-bg, #ffffff);
+    border-radius: var(--btn-radius);
+    border: 1px solid rgba(31, 41, 55, 0.06);
+    box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
+    overflow: hidden;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+
+  /* 悬停时轻微抬起和加深阴影以提示可交互性 */
+  /* .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.10);
+  } */
+
+  /* 头部/主体/尾部的统一内边距和分割线 */
+  .card-header,
+  .card-footer {
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    background-clip: padding-box;
+  }
+
+  .card-header {
+    border-bottom: 1px solid rgba(31, 41, 55, 0.04);
+    background: linear-gradient(180deg, rgba(31, 99, 255, 0.02), transparent);
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: var(--btn-primary);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .card-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 1);
+    margin-right: .75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+  }
+
+  .card-choice{
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 1);
+    margin-left: .75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    vertical-align: middle;
+  }
+
+  .card-input {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: 1px solid var(--btn-primary);
+    border-radius: var(--btn-radius);
+    padding: .375rem .75rem;
+    font-family: inherit;
+    font-size: inherit;
+    transition: border-color .12s ease, box-shadow .12s ease;
+    align-self: flex-end;
+  }
+
+  .card-input:focus {
+    outline: none;
+    border-color: var(--btn-primary);
+    /* box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.1); */
+  }
+
+  .speaker {
+    border-radius: calc(1 * var(--btn-radius));
+    border: 2px solid var(--btn-primary);
+    border-collapse: collapse;
+    overflow: hidden;
+  }
+
+
+  .card-table thead {
+    height: 2em;
+    color: var(--btn-primary);
+    border-bottom: 1px solid var(--btn-primary);
+  }
+
+  .card-table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .card-table tr{
+    height: 3em;
+  }
+
+  .card-table-border-dual tr td{
+    border-right: 1px solid var(--btn-primary);
+    border-bottom: 1px solid var(--btn-primary);
+  }
+  
+  .card-table-border-dual tr:last-child td{
+    border-bottom: none;
+  }
+
+  .card-table td:last-child{
+    border-right: none;
+  }
+
+  .card-table-border-single tr td{
+    border-right: 1px solid var(--btn-primary);
+    border-bottom: 1px solid var(--btn-primary);
+  }
+
+  .card-table th {
+    height: 3em;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.33em;
+  }
+
+  .card-input-underline {
+    width: 50%;
+    text-align: center;
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: none;
+    border-bottom: 2px solid var(--btn-primary);
+    border-radius: 0;
+    padding: .375rem 0;
+    font-family: inherit;
+    font-size: inherit;
+    transition: all .3s;
+  }
+
+
+
+  .card-input.speaker .card-input-underline.speaker {
+    font-weight: 500;
+    max-width: 70%;
+  }
+
+  .card-input.time .card-input-underline.time {
+    width: 80%;
+  }
+
+  .card-subtitle {
+    margin: 10px 10px 10px 10px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: rgba(31, 41, 55, 1);
+    width:fit-content;
+  }
+
+  .card-body {
+    padding: 1rem;
+    color: rgba(31, 41, 55, 0.9);
+  }
+
+  .card-footer {
+    border-top: 1px solid rgba(31, 41, 55, 0.04);
+    justify-content: flex-end;
+    background-color: transparent;
+  }
+
+  .add-speaker-row {
+    display: flex;
+    justify-content: center;
+    /* margin: 0 10px 10px 10px; */
+    /* margin-bottom: */
+  }
+
+  .add-speaker-row.single {
+    margin: 10px 10px 10px 10px;
+  }
+
+  .add-speaker-row.dual {
+    display: flex;
+    justify-content: center;
+    margin: none;
+  }
+
+  .add-speaker-button {
+    border: none;
+    justify-content: center;
+  }
+  .ring-header{
+    margin: 10px 0 10px 0;
+  }
+  /* 侧重色条（例如用于表示状态或队伍颜色） */
+  .card.accent-left {
+    border-left: 4px solid var(--btn-primary);
+  }
+
+  /* 小尺寸/紧凑模式 */
+  .card.card-compact .card-header,
+  .card.card-compact .card-body,
+  .card.card-compact .card-footer {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+
+  /* 数字或计时器类文本，使用项目中已有的等宽风格 */
+  .card .num,
+  .card .time {
+    font-family: 'D-DIN', 'SF Pro', sans-serif;
+    font-weight: 600;
+    color: var(--btn-primary);
+  }
+
+  /* 响应式微调 */
+  @media (max-width: 640px) {
+    .card {
+      border-radius: .5rem;
+    }
+
+    .card-header,
+    .card-footer {
+      padding: .5rem;
+    }
+
+    .card-body {
+      padding: .75rem;
+    }
+  }
 }

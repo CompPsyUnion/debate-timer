@@ -21,6 +21,15 @@
     </div>
   </Transition>
 
+  <!-- page-level alert -->
+  <Transition name="fade">
+    <div v-if="pageAlert.show" class="absolute top-20 right-4 z-50">
+      <div :class="['alert', pageAlert.type === 'success' ? 'alert-success' : 'alert-error']">
+        <span>{{ pageAlert.message }}</span>
+      </div>
+    </div>
+  </Transition>
+
   <!-- Timer View -->
   <DebateTimer ref="debateTimerRef" :timer-data="timerData" @timer-end="handleTimerEnd" />
 
@@ -69,10 +78,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import DebateTimer from '@/components/screen/debateTimer.vue';
-import TimerConfigPanel from '@/components/screen/TimerConfigPanel.vue';
-import type { TimerData, TimerStage } from '@/types/screen';
-import { getDefaultTimerStages } from '@/utils/timerDefaults';
+import DebateTimer from '../components/screen/debateTimer.vue';
+import TimerConfigPanel from '../components/screen/TimerConfigPanel.vue';
+import type { TimerData, TimerStage } from '../types/screen';
+import { getDefaultTimerStages } from '../utils/timerDefaults';
 
 const timerData = ref<TimerData>({
   activityName: '测试活动',
@@ -84,6 +93,7 @@ const timerData = ref<TimerData>({
 const debateTimerRef = ref<InstanceType<typeof DebateTimer> | null>(null);
 const showKeyboardHints = ref(false);
 const isConfigOpen = ref(false);
+const pageAlert = ref({ show: false, type: 'success', message: '' });
 
 const activityName = computed(() => timerData.value.activityName);
 const debateTitle = computed(() => timerData.value.debateTitle);
@@ -104,6 +114,10 @@ const closeConfig = () => {
 };
 
 const applyConfig = (payload: { activityName: string; debateTitle: string; stages: TimerStage[] }) => {
+  // debug log to confirm parent receives payload
+  // eslint-disable-next-line no-console
+  console.debug('[Screen] applyConfig', payload);
+
   timerData.value = {
     activityName: payload.activityName,
     debateTitle: payload.debateTitle,
@@ -117,6 +131,10 @@ const applyConfig = (payload: { activityName: string; debateTitle: string; stage
   setTimeout(() => {
     debateTimerRef.value?.handleReset?.();
   }, 100);
+
+  // show page-level success alert
+  pageAlert.value = { show: true, type: 'success', message: '配置已保存' };
+  setTimeout(() => (pageAlert.value.show = false), 2000);
 };
 </script>
 
